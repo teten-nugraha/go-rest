@@ -1,10 +1,11 @@
 package handler
 
 import (
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/render"
 	"github.com/teten-nugraha/go-chi-simple/db"
 	"net/http"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/render"
 )
 
 var dbInstance db.Database
@@ -13,6 +14,10 @@ func NewHandler(db db.Database) http.Handler {
 	router := chi.NewRouter()
 	dbInstance = db
 
+	router.Use(middleware.RequestID)
+	router.Use(middleware.RealIP)
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
 	router.MethodNotAllowed(methodNotAllowedHandler)
 	router.NotFound(notFoundHandler)
 	router.Route("/items", items)
